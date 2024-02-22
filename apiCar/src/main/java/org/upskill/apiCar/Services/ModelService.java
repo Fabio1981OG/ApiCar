@@ -2,14 +2,13 @@ package org.upskill.apiCar.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.upskill.apiCar.Repository.ModelRepository;
 import org.upskill.apiCar.models.Model;
-import org.upskill.apiCar.models.ModelRepository;
 
 import java.util.List;
 
 @Service
 public class ModelService {
-
     @Autowired
     private ModelRepository modelRepository;
 

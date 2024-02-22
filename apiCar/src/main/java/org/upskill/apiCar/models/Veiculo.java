@@ -1,6 +1,8 @@
 package org.upskill.apiCar.models;
 
+
 import jakarta.persistence.*;
+import org.upskill.apiCar.DTOS.VeiculoDTO;
 
 @Entity
 public class Veiculo {
@@ -8,17 +10,23 @@ public class Veiculo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "model_id")
-    private Model model;
 
     private String licensePlate;
     private int numberOfSeats;
     private int doors;
 
+
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
+
     @ManyToOne
     @JoinColumn(name = "brand_id")
     private Brand brand;
+
+    @ManyToOne
+    @JoinColumn(name = "model_id")
+    private Model model;
 
     @Enumerated(EnumType.STRING)
     private Color color;
@@ -112,11 +120,13 @@ public class Veiculo {
                 ", condition=" + condition +
                 '}';
     }
-    public Brand getBrand(){
+
+    public Brand getBrand() {
         return brand;
     }
 
     public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
     public Model getModel() {
@@ -126,4 +136,44 @@ public class Veiculo {
     public void setModel(Model model) {
         this.model = model;
     }
+
+    public Seller getSeller(){
+        return  seller;
+    }
+
+    public void setSeller(Seller seller){
+        this.seller = seller;
+    }
+
+
+    public VeiculoDTO toDTO() {
+        VeiculoDTO veiculoDTO = new VeiculoDTO();
+        veiculoDTO.setId(this.id);
+        veiculoDTO.setLicensePlate(this.licensePlate);
+        veiculoDTO.setNumberOfSeats(this.numberOfSeats);
+        veiculoDTO.setDoors(this.doors);
+        veiculoDTO.setColor(this.color);
+        veiculoDTO.setType(this.type);
+        veiculoDTO.setFuelType(this.fuelType);
+        veiculoDTO.setCondition(this.condition);
+
+        return veiculoDTO;
+    }
+
+    public static Veiculo fromDTO(VeiculoDTO veiculoDTO) {
+        Veiculo veiculo = new Veiculo();
+
+        veiculo.setLicensePlate(veiculoDTO.getLicensePlate());
+        veiculo.setNumberOfSeats(veiculoDTO.getNumberOfSeats());
+        veiculo.setDoors(veiculoDTO.getDoors());
+        veiculo.setColor(veiculoDTO.getColor());
+        veiculo.setType(veiculoDTO.getType());
+        veiculo.setFuelType(veiculoDTO.getFuelType());
+        veiculo.setCondition(veiculoDTO.getCondition());
+
+
+        return veiculo;
+    }
+
+
 }

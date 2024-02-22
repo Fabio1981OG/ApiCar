@@ -1,37 +1,34 @@
 package org.upskill.apiCar.models;
+
+
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.upskill.apiCar.DTOS.ModelDTO;
+import org.upskill.apiCar.DTOS.VeiculoDTO;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
 public class Model {
 
-
+    @Setter
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
+    @Setter
+    @Getter
     private String name;
 
     @OneToMany(mappedBy = "model", cascade = CascadeType.ALL)
     private List<Veiculo> veiculos;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public Model(List<Veiculo> veiculos) {
+        this.veiculos = veiculos;
     }
 
     @Override
@@ -40,5 +37,24 @@ public class Model {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    public ModelDTO toDTO() {
+        ModelDTO dto = new ModelDTO();
+        dto.setId(this.id);
+        dto.setName(this.name);
+
+        if (this.veiculos != null) {
+            dto.setVeiculos(
+                    this.veiculos.stream().map(veiculo -> {
+                        VeiculoDTO veiculoDTO = new VeiculoDTO();
+                        veiculoDTO.setId(veiculo.getId());
+
+                        return veiculoDTO;
+                    }).collect(Collectors.toList())
+            );
+        }
+
+        return dto;
     }
 }

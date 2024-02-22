@@ -1,13 +1,23 @@
 package org.upskill.apiCar.Services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.upskill.apiCar.exceptions.VeiculoNotFoundException;
-import org.upskill.apiCar.models.*;
+import org.upskill.apiCar.Exceptions.VeiculoNotFoundException;
+import org.upskill.apiCar.Repository.BrandRepository;
+import org.upskill.apiCar.Repository.ModelRepository;
+import org.upskill.apiCar.Repository.SellerRepository;
+import org.upskill.apiCar.Repository.VeiculoRepository;
+import org.upskill.apiCar.models.Brand;
+import org.upskill.apiCar.models.Model;
+import org.upskill.apiCar.models.Seller;
+import org.upskill.apiCar.models.Veiculo;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
+
 public class VeiculoService {
 
     @Autowired
@@ -18,27 +28,35 @@ public class VeiculoService {
 
     @Autowired
     private ModelRepository modelRepository;
+    @Autowired
+    private SellerRepository sellerRepository;
 
-    public Veiculo salvarVeiculo(Veiculo veiculo, Long brandId, Long modelId) {
-        Brand brand = brandRepository.findById(brandId)
-                .orElseThrow(() -> new RuntimeException("Marca não encontrada com ID: " + brandId));
+    public Veiculo salvarVeiculo(Veiculo veiculo, Long brandId, Long modelId,Long sellerId ) {
+        Brand brand = brandRepository.findById(brandId).orElseThrow(() -> new EntityNotFoundException("Marca não encontrada"));
+        Model model = modelRepository.findById(modelId).orElseThrow(() -> new EntityNotFoundException("Modelo não encontrado"));
+        Seller seller = sellerRepository.findById(sellerId).orElseThrow(() -> new EntityNotFoundException("Seller não encontrado"));
 
-        Model model = modelRepository.findById(modelId)
-                .orElseThrow(() -> new RuntimeException("Modelo não encontrado com ID: " + modelId));
 
         veiculo.setBrand(brand);
         veiculo.setModel(model);
+        veiculo.setSeller(seller);
 
         return veiculoRepository.save(veiculo);
     }
-
     public Veiculo salvarVeiculo(Veiculo veiculo) {
-        return veiculoRepository.save(veiculo);
+        try {
+
+            Veiculo veiculoSalvo = veiculoRepository.save(veiculo);
+            return veiculoSalvo;
+        } catch (Exception e) {
+
+            throw new RuntimeException("Erro ao salvar o veículo", e);
+        }
     }
 
     public Veiculo obterVeiculoPorId(Long id) {
-        return veiculoRepository.findById(id)
-                .orElseThrow(() -> new VeiculoNotFoundException("Veículo não encontrado com ID: " + id));
+        Optional<Veiculo> veiculoOptional = veiculoRepository.findById(id);
+        return (Veiculo) ((Optional<?>) veiculoOptional).orElseThrow(() -> new VeiculoNotFoundException("Veículo não encontrado com ID: " + id));
     }
 
     public List<Veiculo> listarVeiculos() {
@@ -46,9 +64,11 @@ public class VeiculoService {
     }
 
     public void deletarVeiculo(Long id) {
-        if (!veiculoRepository.existsById(id)) {
-            throw new VeiculoNotFoundException("Veículo não encontrado com ID: " + id);
+        try {
+            veiculoRepository.deleteById(id);
+        } catch (Exception e) {
+
+            throw new RuntimeException("Erro ao deletar o veículo com ID: " + id, e);
         }
-        veiculoRepository.deleteById(id);
     }
 }

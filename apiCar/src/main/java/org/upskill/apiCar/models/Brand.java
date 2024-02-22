@@ -1,10 +1,10 @@
 package org.upskill.apiCar.models;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
-
+import org.upskill.apiCar.DTOS.BrandDTO;
 
 @Entity
 public class Brand {
@@ -36,6 +36,13 @@ public class Brand {
         return "Brand{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-        '}';
+                '}';
+    }
+
+    public BrandDTO toDTO() {
+        BrandDTO dto = new BrandDTO();
+        dto.setId(this.id);
+        dto.setName(this.name);
+        return dto;
     }
 }
